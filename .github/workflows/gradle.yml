@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   call-workflow-passing-data:
-    uses: ParkSungCheol/testService1/.github/workflows/template.yml@master
+    uses: testserviceteam/testService1/.github/workflows/template.yml@master
     with:
       repo: test1
+    secrets: inherit
