@@ -12,7 +12,7 @@ public class testComponent {
     @GetMapping(value = "/")
     public String test() {
         // 원하는 처리 수행
-        return "[GET] test1 is running !!!";
+        return "[GET] test1 is running !!";
     }
 
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
