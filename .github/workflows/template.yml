@@ -48,6 +48,7 @@ jobs:
         script: |
           cd /home/${{ secrets.SERVER_USERNAME }}
           sudo ./deployment.sh ${{ inputs.repo }}
+          sudo kubectl delete deployment ${{ inputs.repo }} -n ingress-nginx
           sudo kubectl apply -f deployment.yaml
           sudo kubectl apply -f autoscaling.yaml
           sudo kubectl apply -f routingrule.yaml
