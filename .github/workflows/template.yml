@@ -40,7 +40,7 @@ jobs:
         dockerfile_content=$(curl -s https://api.github.com/repos/testserviceteam/testService1/contents/Dockerfile | jq -r '.content' | tr -d '"' | base64 -d)
         # 추출한 Dockerfile 내용 출력
         echo "$dockerfile_content" > Dockerfile
-    - name: docker login
+    - name: Docker Build
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ inputs.repo }} .
