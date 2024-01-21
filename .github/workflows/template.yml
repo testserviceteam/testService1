@@ -34,9 +34,32 @@ jobs:
       run: chmod +x ./gradlew
     - name: Build with Gradle
       run: ./gradlew bootJar
-    - name: docker build and push
+    - name: Download Dockerfile
+      run: |
+        curl -O https://github.com/testserviceteam/testService1/blob/master/Dockerfile
+    - name: docker login
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+    - name: Check if Docker Hub repository exists
+      run: |
+        REPO_NAME="${{ secrets.DOCKER_USERNAME }}/${{ inputs.repo }}"
+        TOKEN=$(echo "${{ secrets.DOCKERHUB_TOKEN }}" | base64 -d)
+        # Check if repository exists
+        response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/${{ inputs.repo }}/)
+        echo "::set-output name=repo_exists::$(if [ $response -eq 200 ]; then echo true; else echo false; fi)"
+    - name: Create Docker Hub repository using API (if not exists)
+      if: steps.check-repo.outputs.repo_exists == 'false'
+      run: |
+        REPO_NAME="${{ secrets.DOCKER_USERNAME }}/${{ inputs.repo }}"
+        TOKEN=$(echo "${{ secrets.DOCKERHUB_TOKEN }}" | base64 -d)
+        # Create a new repository using Docker Hub API
+        curl -X POST \
+          -H "Authorization: JWT $TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{"namespace": "${{ secrets.DOCKER_USERNAME }}", "name": "${{ inputs.repo }}", "description": ""}' \
+          https://hub.docker.com/v2/repositories/create/
+    - name: docker build
+      run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ inputs.repo }} .
         docker push ${{ secrets.DOCKER_USERNAME }}/${{ inputs.repo }}
     - name: executing remote ssh commands using password
