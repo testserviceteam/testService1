@@ -50,6 +50,7 @@ jobs:
         # Check if repository exists
         response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: JWT $TOKEN" https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/${{ inputs.repo }}/)
         echo "::set-output name=repo_exists::$(if [ $response -eq 200 ]; then echo true; else echo false; fi)"
+        echo steps.check-repo.outputs.repo_exists
     - name: Create Docker Hub repository using API (if not exists)
       if: steps.check-repo.outputs.repo_exists == 'false'
       run: |
