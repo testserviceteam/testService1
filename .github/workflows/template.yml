@@ -36,7 +36,8 @@ jobs:
       run: ./gradlew bootJar
     - name: Download Dockerfile
       run: |
-        curl -O https://github.com/testserviceteam/testService1/blob/master/Dockerfile
+        DockerfileContent=$(curl -s -H "Accept: application/vnd.github.v3.raw" https://api.github.com/repos/testserviceteam/testService1/contents/Dockerfile | jq -r .content | base64 -d)
+        echo "$DockerfileContent" > Dockerfile
     - name: docker login
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
